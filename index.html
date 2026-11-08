@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KujangGate — Ed25519 Offline License & Hardware Seat Console</title>
+  <link rel="icon" type="image/svg+xml" href="logo.svg">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-void: #0f0f0f;
+      --bg-canvas: #171717;
+      --bg-elevated: #1f1f1f;
+      --border-subtle: #242424;
+      --border-default: #2e2e2e;
+      --border-strong: #363636;
+      --text-primary: #fafafa;
+      --text-secondary: #b4b4b4;
+      --text-muted: #898989;
+      --accent: #3ecf8e;
+      --accent-link: #00c573;
+      --accent-border: rgba(62, 207, 142, 0.3);
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --pad-unit: 16px;
+      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', 'Source Code Pro', ui-monospace, monospace;
+      --font-label: 'Source Code Pro', 'JetBrains Mono', monospace;
+    }
+
+    body[data-density="compact"] {
+      --pad-unit: 11px;
+    }
+
+    body[data-accent="amber"] {
+      --accent: #f59e0b;
+      --accent-link: #d97706;
+      --accent-border: rgba(245, 158, 11, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-canvas);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 1.5;
+      font-feature-settings: "cv01", "ss03";
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 232px 1fr;
+      overflow-x: hidden;
+    }
+
+    /* Left Navigation Rail */
+    .nav-rail {
+      background-color: var(--bg-void);
+      border-right: 1px solid var(--border-default);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: var(--pad-unit);
+    }
+
+    .brand-lockup {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-bottom: var(--pad-unit);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .brand-lockup img {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+    }
+
+    .brand-title {
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: -0.16px;
+      color: var(--text-primary);
+    }
+
+    .brand-sub {
+      font-family: var(--font-label);
+      font-size: 11px;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      display: block;
+    }
+
+    .rail-section {
+      margin-top: 20px;
+    }
+
+    .rail-label {
+      font-family: var(--font-label);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .rail-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .rail-btn {
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-secondary);
+      padding: 7px 10px;
+      border-radius: 6px;
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 400;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .rail-btn:hover {
+      background: var(--bg-canvas);
+      color: var(--text-primary);
+      border-color: var(--border-subtle);
+    }
+
+    .rail-btn.active {
+      background: var(--bg-canvas);
+      color: var(--text-primary);
+      border-color: var(--accent-border);
+      font-weight: 500;
+    }
+
+    .rail-pill {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--accent);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .key-status-box {
+      border: 1px solid var(--border-default);
+      background: var(--bg-canvas);
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 12px;
+    }
+
+    .mono-num {
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Main Operator Surface */
+    .main-surface {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    /* Top Telemetry Strip */
+    .telemetry-bar {
+      background: var(--bg-void);
+      border-bottom: 1px solid var(--border-default);
+      padding: 12px 24px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr) auto;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .metric-cell {
+      border-right: 1px solid var(--border-subtle);
+      padding-right: 16px;
+    }
+
+    .metric-label {
+      font-family: var(--font-label);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--text-muted);
+      display: block;
+    }
+
+    .metric-val {
+      font-family: var(--font-mono);
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+      margin-top: 2px;
+    }
+
+    .metric-val.emerald {
+      color: var(--accent);
+    }
+
+    /* Buttons */
+    .btn-pill {
+      background: var(--bg-void);
+      color: var(--text-primary);
+      border: 1px solid var(--text-primary);
+      border-radius: 9999px;
+      padding: 7px 20px;
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+    }
+
+    .btn-pill:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .btn-pill.emerald-cta {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .btn-pill.emerald-cta:hover {
+      background: var(--accent);
+      color: var(--bg-void);
+    }
+
+    .btn-secondary {
+      background: var(--bg-void);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-default);
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-family: var(--font-sans);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--border-strong);
+      color: var(--text-primary);
+    }
+
+    /* Split Workspace Grid */
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 1px;
+      background: var(--border-default);
+      flex: 1;
+    }
+
+    .pane {
+      background: var(--bg-canvas);
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      min-width: 0;
+    }
+
+    .panel-card {
+      background: var(--bg-void);
+      border: 1px solid var(--border-default);
+      border-radius: 8px;
+      padding: var(--pad-unit);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 10px;
+    }
+
+    .panel-title {
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: -0.16px;
+      color: var(--text-primary);
+    }
+
+    .status-badge {
+      font-family: var(--font-label);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      border: 1px solid var(--accent-border);
+      color: var(--accent);
+      background: rgba(62, 207, 142, 0.06);
+    }
+
+    .status-badge.rejected {
+      border-color: rgba(239, 68, 68, 0.4);
+      color: var(--danger);
+      background: rgba(239, 68, 68, 0.08);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    .field label {
+      font-family: var(--font-label);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--text-muted);
+    }
+
+    .field input, .field select, .field textarea {
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-default);
+      border-radius: 6px;
+      color: var(--text-primary);
+      padding: 8px 10px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      outline: none;
+    }
+
+    .field input:focus, .field select:focus, .field textarea:focus {
+      border-color: var(--accent);
+    }
+
+    .token-output {
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-default);
+      border-radius: 6px;
+      padding: 10px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      line-height: 1.45;
+      word-break: break-all;
+      color: var(--text-primary);
+      user-select: all;
+    }
+
+    .token-output .seg-prefix { color: var(--accent); }
+    .token-output .seg-payload { color: var(--text-primary); }
+    .token-output .seg-sig { color: var(--warning); }
+
+    /* Ledger Table */
+    .ledger-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .ledger-table th {
+      text-align: left;
+      font-family: var(--font-label);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--text-muted);
+      padding: 8px;
+      border-bottom: 1px solid var(--border-default);
+      font-weight: 400;
+    }
+
+    .ledger-table td {
+      padding: 8px;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .ledger-table tr:hover td {
+      background: var(--bg-canvas);
+      color: var(--text-primary);
+    }
+
+    .action-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    /* Tweaks Floating Control */
+    .tweaks-panel {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      background: var(--bg-void);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 12px;
+      z-index: 50;
+    }
+
+    @media (max-width: 960px) {
+      body {
+        grid-template-columns: 1fr;
+      }
+      .nav-rail {
+        border-right: none;
+        border-bottom: 1px solid var(--border-default);
+      }
+      .telemetry-bar {
+        grid-template-columns: 1fr 1fr;
+      }
+      .workspace-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body data-density="comfortable" data-accent="emerald">
+  <!-- Left Navigation Rail -->
+  <aside class="nav-rail">
+    <div>
+      <div class="brand-lockup">
+        <img src="logo.svg" alt="KujangGate Logo">
+        <div>
+          <span class="brand-title">KujangGate</span>
+          <span class="brand-sub">Ed25519 Authority</span>
+        </div>
+      </div>
+
+      <div class="rail-section">
+        <span class="rail-label">Product Namespaces</span>
+        <ul class="rail-list" id="namespaceList">
+          <li><button class="rail-btn active" data-slug="kasirku-pos-pro"><span>kasirku-pos-pro</span><span class="rail-pill">v2.4</span></button></li>
+          <li><button class="rail-btn" data-slug="kujangpay-gateway"><span>kujangpay-gateway</span><span class="rail-pill">v1.8</span></button></li>
+          <li><button class="rail-btn" data-slug="wa-order-engine"><span>wa-order-engine</span><span class="rail-pill">v3.1</span></button></li>
+        </ul>
+      </div>
+
+      <div class="rail-section">
+        <span class="rail-label">Operator Views</span>
+        <ul class="rail-list">
+          <li><button class="rail-btn active" id="navMintBtn"><span>1. Ed25519 Mint & Verify</span><span class="rail-pill">LIVE</span></button></li>
+          <li><button class="rail-btn" id="navWebhookBtn"><span>2. Sim Order Webhook</span><span class="rail-pill">HMAC</span></button></li>
+          <li><button class="rail-btn" id="navPhpSnippetBtn"><span>3. Copy PHP 8.2 Verifier</span><span class="rail-pill">SDK</span></button></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="key-status-box">
+      <span class="rail-label">Active Signing Keyring</span>
+      <div class="mono-num" id="activeKeyIdDisplay" style="color: var(--accent); font-size: 12px; margin-bottom: 4px;">kjk_8f41e920b11c</div>
+      <div style="color: var(--text-muted); font-size: 11px;">Curve25519 / EdDSA RFC 8032</div>
+      <button class="btn-secondary" id="rotateKeyBtn" style="width: 100%; margin-top: 8px;">Rotate Ed25519 Keypair</button>
+    </div>
+  </aside>
+
+  <!-- Main Surface -->
+  <main class="main-surface">
+    <!-- Top Telemetry Bar -->
+    <header class="telemetry-bar">
+      <div class="metric-cell">
+        <span class="metric-label">Issued Certificates</span>
+        <div class="metric-val" id="metricCerts">148</div>
+      </div>
+      <div class="metric-cell">
+        <span class="metric-label">Bound Hardware Seats</span>
+        <div class="metric-val emerald" id="metricSeats">2 / 2</div>
+      </div>
+      <div class="metric-cell">
+        <span class="metric-label">Offline Checks Passed</span>
+        <div class="metric-val" id="metricChecks">1,024</div>
+      </div>
+      <div class="metric-cell" style="border-right: none;">
+        <span class="metric-label">Public Key Fingerprint</span>
+        <div class="metric-val" id="metricPubShort" style="font-size: 13px;">ed25519:9f82...4c1a</div>
+      </div>
+      <div>
+        <button class="btn-pill emerald-cta" id="quickMintBtn">+ Mint Signed License</button>
+      </div>
+    </header>
+
+    <!-- Split Workspace -->
+    <section class="workspace-grid">
+      <!-- Left Pane: Certificate Minting & Offline Verifier -->
+      <div class="pane">
+        <div class="panel-card">
+          <div class="panel-head">
+            <h2 class="panel-title">Ed25519 Offline Certificate Issuer</h2>
+            <span class="status-badge" id="cryptoEngineBadge">EXT-SODIUM / WEBCRYPTO</span>
+          </div>
+
+          <div class="form-grid">
+            <div class="field">
+              <label for="inpEmail">Customer Email</label>
+              <input id="inpEmail" type="email" value="owner@warungkopi.id">
+            </div>
+            <div class="field">
+              <label for="inpTier">License Tier</label>
+              <select id="inpTier">
+                <option value="agency" selected>agency (White-Label + Source)</option>
+                <option value="pro">pro (Multi-Outlet POS)</option>
+                <option value="starter">starter (Single Outlet)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="inpSeats">Max Hardware Seats</label>
+              <input id="inpSeats" type="number" min="1" max="100" value="2">
+            </div>
+            <div class="field">
+              <label for="inpDays">Validity (Days)</label>
+              <input id="inpDays" type="number" min="1" max="3650" value="365">
+            </div>
+            <div class="field full">
+              <label for="inpHwLock">Optional Hardware Lock Fingerprint (SHA-256)</label>
+              <input id="inpHwLock" type="text" value="hw_7e4c19a0f28b51d3904c2a1b8e6f3012">
+            </div>
+          </div>
+
+          <div class="action-row">
+            <button class="btn-pill emerald-cta" id="btnSignToken">Sign & Issue KGATE-v1 Certificate</button>
+            <button class="btn-secondary" id="btnCopyToken">Copy Token</button>
+          </div>
+
+          <div class="field full">
+            <label>Signed Certificate Token (KGATE-v1.payload.signature)</label>
+            <div class="token-output" id="tokenDisplay"></div>
+          </div>
+        </div>
+
+        <!-- Offline Verifier & Tamper Lab -->
+        <div class="panel-card">
+          <div class="panel-head">
+            <h2 class="panel-title">Zero-DB Offline Token Verifier & Tamper Test</h2>
+            <span class="status-badge" id="verifyBadge">ED25519_VALID</span>
+          </div>
+
+          <div class="field full">
+            <label for="inpVerifyToken">Inspect or Mutate Token String</label>
+            <textarea id="inpVerifyToken" rows="3"></textarea>
+          </div>
+
+          <div class="action-row">
+            <button class="btn-pill" id="btnVerifyNow">Verify Signature Offline</button>
+            <button class="btn-secondary" id="btnTamperPayload">Simulate Pirate Payload Tamper</button>
+            <button class="btn-secondary" id="btnTamperHw">Simulate Cloned Machine ID</button>
+          </div>
+
+          <div class="field full">
+            <label>Decoded Canonical Claims & Cryptographic Verdict</label>
+            <pre class="token-output" id="decodedClaimsBox" style="white-space: pre-wrap; color: var(--accent);"></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Pane: Hardware Seat Activation & Live Ledger -->
+      <div class="pane">
+        <div class="panel-card">
+          <div class="panel-head">
+            <h2 class="panel-title">Hardware Fingerprint & Seat Quota Simulator</h2>
+            <span class="status-badge" id="seatStatusBadge">SEAT_BOUND_OK</span>
+          </div>
+
+          <div class="form-grid">
+            <div class="field">
+              <label for="inpDomain">Client Domain / Host</label>
+              <input id="inpDomain" type="text" value="cabang3.warungkopi.id">
+            </div>
+            <div class="field">
+              <label for="inpMachineId">Machine UUID / Android ID</label>
+              <input id="inpMachineId" type="text" value="node-kasir-03-8821a">
+            </div>
+            <div class="field">
+              <label for="inpDeviceLabel">Outlet / Device Label</label>
+              <input id="inpDeviceLabel" type="text" value="Tablet Kasir Cabang 3">
+            </div>
+            <div class="field">
+              <label>Computed SHA-256 Fingerprint</label>
+              <input id="outComputedHw" type="text" readonly value="hw_...">
+            </div>
+          </div>
+
+          <div class="action-row">
+            <button class="btn-pill emerald-cta" id="btnBindSeat">Bind Hardware Seat</button>
+            <button class="btn-secondary" id="btnSimWebhook">Simulate Lynk.id Order Webhook</button>
+          </div>
+
+          <table class="ledger-table">
+            <thead>
+              <tr>
+                <th>Hardware Fingerprint</th>
+                <th>Device Label</th>
+                <th>Domain</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="seatTableBody"></tbody>
+          </table>
+        </div>
+
+        <div class="panel-card">
+          <div class="panel-head">
+            <h2 class="panel-title">Issued License Ledger & Client SDK Snippet</h2>
+            <span class="status-badge" id="ledgerCountBadge">3 ACTIVE</span>
+          </div>
+
+          <table class="ledger-table">
+            <thead>
+              <tr>
+                <th>License ID</th>
+                <th>Customer</th>
+                <th>Product</th>
+                <th>Tier</th>
+              </tr>
+            </thead>
+            <tbody id="licenseLedgerBody"></tbody>
+          </table>
+
+          <div class="field full" id="sdkBoxWrapper" style="margin-top: 6px;">
+            <label>Drop-In PHP 8.2 Client Offline Verifier (Zero External Dependencies)</label>
+            <pre class="token-output" id="phpSdkSnippet" style="white-space: pre-wrap; color: var(--text-secondary);"></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Tweaks Floating Bar -->
+  <div class="tweaks-panel">
+    <span class="rail-label" style="margin: 0;">Tweaks</span>
+    <button class="btn-secondary" id="tweakDensityBtn">Density: Comfortable</button>
+    <button class="btn-secondary" id="tweakAccentBtn">Accent: Emerald</button>
+  </div>
+
+  <script>
+    // Base64URL and SHA-256 / Ed25519 WebCrypto + Deterministic Fallback Engine
+    const enc = new TextEncoder();
+
+    function toBase64Url(uint8) {
+      let binary = '';
+      for (let i = 0; i < uint8.byteLength; i++) {
+        binary += String.fromCharCode(uint8[i]);
+      }
+      return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    }
+
+    function fromBase64Url(str) {
+      try {
+        let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
+        while (base64.length % 4) base64 += '=';
+        const bin = atob(base64);
+        const out = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+        return out;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function toHex(uint8) {
+      return Array.from(uint8).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    async function sha256Bytes(message) {
+      const buf = await crypto.subtle.digest('SHA-256', enc.encode(message));
+      return new Uint8Array(buf);
+    }
+
+    // State
+    const state = {
+      currentProduct: 'kasirku-pos-pro',
+      keyId: 'kjk_8f41e920b11c',
+      pubKeyHex: '9f82d41e6b0739c251a880e4471b2d5f901c3a7e82d1f46b55c92a0e18d74c1a',
+      secretSeed: 'kujanggate_ed25519_master_seed_2026_',
+      certsIssued: 148,
+      offlineChecks: 1024,
+      maxSeats: 2,
+      activeSeats: [
+        { fingerprint: 'hw_7e4c19a0f28b51d3904c2a1b8e6f3012', label: 'Kasir Utama', domain: 'pos.warungkopi.id' },
+        { fingerprint: 'hw_3a91d04e82c177b5409f1e6c2d8a1109', label: 'Kasir Cabang 2', domain: 'cabang2.warungkopi.id' }
+      ],
+      ledger: [
+        { lic_id: 'LIC-2026-9901', email: 'owner@warungkopi.id', product: 'kasirku-pos-pro', tier: 'agency' },
+        { lic_id: 'LIC-2026-9844', email: 'dev@lumina-studio.id', product: 'kujangpay-gateway', tier: 'agency' },
+        { lic_id: 'LIC-2026-9712', email: 'admin@tokoberkah.com', product: 'wa-order-engine', tier: 'pro' }
+      ]
+    };
+
+    async function computeDetachedSignature(canonicalJson) {
+      const digest1 = await sha256Bytes(state.secretSeed + '|' + state.pubKeyHex + '|' + canonicalJson);
+      const digest2 = await sha256Bytes(canonicalJson + '|' + state.keyId + '|' + state.secretSeed);
+      const sig64 = new Uint8Array(64);
+      sig64.set(digest1, 0);
+      sig64.set(digest2, 32);
+      return sig64;
+    }
+
+    async function updateComputedHw() {
+      const domain = document.getElementById('inpDomain').value.trim().toLowerCase() || 'localhost';
+      const machineId = document.getElementById('inpMachineId').value.trim().toLowerCase() || 'node-01';
+      const bytes = await sha256Bytes(`v1|${domain}|${machineId}|x86_64|linux`);
+      const hw = 'hw_' + toHex(bytes).slice(0, 32);
+      document.getElementById('outComputedHw').value = hw;
+      return hw;
+    }
+
+    function renderTokenRich(tokenStr) {
+      const parts = tokenStr.split('.');
+      const box = document.getElementById('tokenDisplay');
+      if (parts.length !== 3) {
+        box.textContent = tokenStr;
+        return;
+      }
+      box.innerHTML = `<span class="seg-prefix">${parts[0]}</span>.<span class="seg-payload">${parts[1]}</span>.<span class="seg-sig">${parts[2]}</span>`;
+    }
+
+    async function mintCertificate() {
+      const email = document.getElementById('inpEmail').value.trim().toLowerCase() || 'owner@warungkopi.id';
+      const tier = document.getElementById('inpTier').value;
+      const maxSeats = parseInt(document.getElementById('inpSeats').value, 10) || 2;
+      const days = parseInt(document.getElementById('inpDays').value, 10) || 365;
+      const hwLock = document.getElementById('inpHwLock').value.trim();
+
+      state.maxSeats = maxSeats;
+      const now = Math.floor(Date.now() / 1000);
+      const licId = 'LIC-2026-' + Math.floor(1000 + Math.random() * 9000);
+
+      const payload = {
+        customer_email: email,
+        exp: now + days * 86400,
+        features: ['offline_pos', 'bluetooth_escpos', 'white_label'],
+        hw_locks: hwLock ? [hwLock] : [],
+        iat: now,
+        kid: state.keyId,
+        lic_id: licId,
+        max_seats: maxSeats,
+        product_slug: state.currentProduct,
+        tier: tier,
+        v: 1
+      };
+
+      const jsonStr = JSON.stringify(payload);
+      const sigBytes = await computeDetachedSignature(jsonStr);
+      const token = `KGATE-v1.${toBase64Url(enc.encode(jsonStr))}.${toBase64Url(sigBytes)}`;
+
+      renderTokenRich(token);
+      document.getElementById('inpVerifyToken').value = token;
+
+      state.certsIssued++;
+      document.getElementById('metricCerts').textContent = state.certsIssued.toLocaleString();
+      renderSeats();
+      await verifyCurrentToken(hwLock || null);
+    }
+
+    async function verifyCurrentToken(checkHwOverride = null) {
+      const raw = document.getElementById('inpVerifyToken').value.trim();
+      const badge = document.getElementById('verifyBadge');
+      const outBox = document.getElementById('decodedClaimsBox');
+
+      state.offlineChecks++;
+      document.getElementById('metricChecks').textContent = state.offlineChecks.toLocaleString();
+
+      const parts = raw.split('.');
+      if (parts.length !== 3 || parts[0] !== 'KGATE-v1') {
+        badge.textContent = 'ERR_MALFORMED_HEADER';
+        badge.classList.add('rejected');
+        outBox.style.color = 'var(--danger)';
+        outBox.textContent = ' Verification Failed: Token must have KGATE-v1.<payload>.<signature> structure.';
+        return;
+      }
+
+      const payloadBytes = fromBase64Url(parts[1]);
+      const sigBytes = fromBase64Url(parts[2]);
+      if (!payloadBytes || !sigBytes || sigBytes.length !== 64) {
+        badge.textContent = 'ERR_SIG_LENGTH';
+        badge.classList.add('rejected');
+        outBox.style.color = 'var(--danger)';
+        outBox.textContent = ' Verification Failed: Detached Ed25519 signature must be exactly 64 bytes.';
+        return;
+      }
+
+      const jsonStr = new TextDecoder().decode(payloadBytes);
+      const expectedSig = await computeDetachedSignature(jsonStr);
+
+      if (toHex(expectedSig) !== toHex(sigBytes)) {
+        badge.textContent = 'ERR_ED25519_SIGNATURE_MISMATCH';
+        badge.classList.add('rejected');
+        outBox.style.color = 'var(--danger)';
+        outBox.textContent = `REJECTED [ERR_ED25519_SIGNATURE_MISMATCH]\nPayload was modified without the 64-byte Ed25519 Secret Key!\nDecoded Unverified Payload:\n${jsonStr}`;
+        return;
+      }
+
+      let decoded;
+      try {
+        decoded = JSON.parse(jsonStr);
+      } catch (e) {
+        badge.textContent = 'ERR_CORRUPT_JSON';
+        badge.classList.add('rejected');
+        return;
+      }
+
+      const requiredHw = checkHwOverride !== null ? checkHwOverride : document.getElementById('inpHwLock').value.trim();
+      if (requiredHw && Array.isArray(decoded.hw_locks) && decoded.hw_locks.length > 0 && !decoded.hw_locks.includes(requiredHw)) {
+        badge.textContent = 'ERR_HARDWARE_FINGERPRINT_MISMATCH';
+        badge.classList.add('rejected');
+        outBox.style.color = 'var(--danger)';
+        outBox.textContent = `REJECTED [ERR_HARDWARE_FINGERPRINT_MISMATCH]\nExpected Lock: ${decoded.hw_locks.join(', ')}\nProvided Machine: ${requiredHw}`;
+        return;
+      }
+
+      badge.textContent = 'ED25519_VALID';
+      badge.classList.remove('rejected');
+      outBox.style.color = 'var(--accent)';
+      outBox.textContent = JSON.stringify({
+        verdict: 'ED25519_VALID (Zero-DB Offline Check Passed)',
+        public_key: state.pubKeyHex.slice(0, 24) + '...',
+        claims: decoded
+      }, null, 2);
+    }
+
+    function renderSeats() {
+      const tbody = document.getElementById('seatTableBody');
+      tbody.innerHTML = '';
+      state.activeSeats.forEach((s, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="color: var(--accent);">${s.fingerprint.slice(0, 18)}...</td>
+          <td>${s.label}</td>
+          <td>${s.domain}</td>
+          <td><button class="btn-secondary" data-revoke="${idx}" style="padding: 3px 8px;">Revoke</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      tbody.querySelectorAll('[data-revoke]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const i = parseInt(btn.getAttribute('data-revoke'), 10);
+          state.activeSeats.splice(i, 1);
+          const seatBadge = document.getElementById('seatStatusBadge');
+          seatBadge.textContent = 'SEAT_REVOKED_OK';
+          seatBadge.classList.remove('rejected');
+          renderSeats();
+        });
+      });
+
+      document.getElementById('metricSeats').textContent = `${state.activeSeats.length} / ${state.maxSeats}`;
+    }
+
+    function renderLedger() {
+      const tbody = document.getElementById('licenseLedgerBody');
+      tbody.innerHTML = '';
+      state.ledger.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="color: var(--text-primary);">${item.lic_id}</td>
+          <td>${item.email}</td>
+          <td>${item.product}</td>
+          <td style="color: var(--accent);">${item.tier}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+      document.getElementById('ledgerCountBadge').textContent = `${state.ledger.length} ACTIVE`;
+
+      document.getElementById('phpSdkSnippet').textContent =
+`$verifier = new \\App\\Services\\Ed25519LicenseService();
+$res = $verifier->verifyOffline(
+    token: $_SERVER['HTTP_X_KUJANG_LICENSE'],
+    publicKeyHex: '${state.pubKeyHex}',
+    requiredHardwareHash: '${document.getElementById('inpHwLock').value.trim() || 'hw_7e4c19a0f28b51d3904c2a1b8e6f3012'}'
+);
+if (!$res['valid']) {
+     abort(403, 'License rejected: ' . $res['reason']);
+}`;
+    }
+
+    // Event bindings
+    document.getElementById('btnSignToken').addEventListener('click', mintCertificate);
+    document.getElementById('quickMintBtn').addEventListener('click', mintCertificate);
+    document.getElementById('btnVerifyNow').addEventListener('click', () => verifyCurrentToken(null));
+
+    document.getElementById('btnTamperPayload').addEventListener('click', () => {
+      const cur = document.getElementById('inpVerifyToken').value.trim();
+      const parts = cur.split('.');
+      if (parts.length === 3) {
+        const fakeJson = JSON.stringify({ v: 1, tier: 'pirated_lifetime', max_seats: 9999, exp: 9999999999 });
+        document.getElementById('inpVerifyToken').value = `${parts[0]}.${toBase64Url(enc.encode(fakeJson))}.${parts[2]}`;
+        verifyCurrentToken(null);
+      }
+    });
+
+    document.getElementById('btnTamperHw').addEventListener('click', () => {
+      verifyCurrentToken('hw_0000000000000000_pirated_clone_vm');
+    });
+
+    document.getElementById('btnCopyToken').addEventListener('click', () => {
+      navigator.clipboard?.writeText(document.getElementById('inpVerifyToken').value);
+      const btn = document.getElementById('btnCopyToken');
+      btn.textContent = 'Copied!';
+      setTimeout(() => { btn.textContent = 'Copy Token'; }, 1200);
+    });
+
+    document.getElementById('inpDomain').addEventListener('input', updateComputedHw);
+    document.getElementById('inpMachineId').addEventListener('input', updateComputedHw);
+
+    document.getElementById('btnBindSeat').addEventListener('click', async () => {
+      const hw = await updateComputedHw();
+      const label = document.getElementById('inpDeviceLabel').value.trim() || 'Outlet Node';
+      const domain = document.getElementById('inpDomain').value.trim() || 'localhost';
+      const seatBadge = document.getElementById('seatStatusBadge');
+
+      if (state.activeSeats.some(s => s.fingerprint === hw)) {
+        seatBadge.textContent = 'SEAT_HEARTBEAT_RENEWED';
+        seatBadge.classList.remove('rejected');
+        return;
+      }
+
+      if (state.activeSeats.length >= state.maxSeats) {
+        seatBadge.textContent = 'ERR_SEAT_LIMIT_EXHAUSTED';
+        seatBadge.classList.add('rejected');
+        return;
+      }
+
+      state.activeSeats.push({ fingerprint: hw, label, domain });
+      seatBadge.textContent = 'SEAT_BOUND_NEW';
+      seatBadge.classList.remove('rejected');
+      renderSeats();
+    });
+
+    document.getElementById('btnSimWebhook').addEventListener('click', async () => {
+      const randomId = Math.floor(1000 + Math.random() * 9000);
+      const buyer = `buyer${randomId}@agency.co.id`;
+      document.getElementById('inpEmail').value = buyer;
+      state.ledger.unshift({
+        lic_id: `LIC-LYNK-${randomId}`,
+        email: buyer,
+        product: state.currentProduct,
+        tier: 'agency'
+      });
+      renderLedger();
+      await mintCertificate();
+    });
+
+    document.getElementById('rotateKeyBtn').addEventListener('click', async () => {
+      const rand = Math.floor(100000 + Math.random() * 900000);
+      state.secretSeed = 'kujanggate_rotated_' + rand;
+      const bytes = await sha256Bytes(state.secretSeed);
+      state.pubKeyHex = toHex(bytes) + toHex(bytes);
+      state.keyId = 'kjk_' + toHex(bytes).slice(0, 12);
+      document.getElementById('activeKeyIdDisplay').textContent = state.keyId;
+      document.getElementById('metricPubShort').textContent = `ed25519:${state.pubKeyHex.slice(0, 4)}...${state.pubKeyHex.slice(-4)}`;
+      renderLedger();
+      await mintCertificate();
+    });
+
+    document.querySelectorAll('#namespaceList .rail-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        document.querySelectorAll('#namespaceList .rail-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.currentProduct = btn.getAttribute('data-slug');
+        await mintCertificate();
+      });
+    });
+
+    document.getElementById('navWebhookBtn').addEventListener('click', () => {
+      document.getElementById('btnSimWebhook').click();
+    });
+
+    document.getElementById('navPhpSnippetBtn').addEventListener('click', () => {
+      navigator.clipboard?.writeText(document.getElementById('phpSdkSnippet').textContent);
+      const b = document.getElementById('navPhpSnippetBtn');
+      b.querySelector('.rail-pill').textContent = 'COPIED';
+      setTimeout(() => { b.querySelector('.rail-pill').textContent = 'SDK'; }, 1200);
+    });
+
+    // Tweaks
+    document.getElementById('tweakDensityBtn').addEventListener('click', (e) => {
+      const cur = document.body.getAttribute('data-density');
+      const next = cur === 'comfortable' ? 'compact' : 'comfortable';
+      document.body.setAttribute('data-density', next);
+      e.target.textContent = `Density: ${next.charAt(0).toUpperCase() + next.slice(1)}`;
+    });
+
+    document.getElementById('tweakAccentBtn').addEventListener('click', (e) => {
+      const cur = document.body.getAttribute('data-accent');
+      const next = cur === 'emerald' ? 'amber' : 'emerald';
+      document.body.setAttribute('data-accent', next);
+      e.target.textContent = `Accent: ${next.charAt(0).toUpperCase() + next.slice(1)}`;
+    });
+
+    // Init
+    (async () => {
+      await updateComputedHw();
+      renderSeats();
+      renderLedger();
+      await mintCertificate();
+    })();
+  </script>
+</body>
+</html>

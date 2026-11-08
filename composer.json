@@ -1,0 +1,19 @@
+{
+    "name": "josskixg/kujanggate",
+    "description": "Self-Hosted Ed25519 Offline License Server, Hardware-Bound Seat Activation & Signed Webhook Engine for Laravel 11 / PHP 8.2+",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "php": "^8.2",
+        "ext-sodium": "*",
+        "ext-json": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    },
+    "scripts": {
+        "test": "php tests/Unit/KujangGateTest.php"
+    }
+}

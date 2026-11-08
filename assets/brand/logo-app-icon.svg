@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256"><title>KujangGate</title><rect width="256" height="256" rx="57.6" fill="#0f0f0f"/><g transform="translate(48.64 48.64) scale(0.62)" fill="#ffffff">
+  <rect width="256" height="256" rx="48" fill="#ffffff"/>
+  <path fill="#ffffff" fill-rule="evenodd" d="M 56 56 L 136 56 L 168 88 L 168 112 L 136 112 L 136 96 L 120 80 L 88 80 L 88 176 L 120 176 L 136 160 L 136 144 L 168 144 L 168 168 L 136 200 L 56 200 Z M 72 112 L 104 112 L 104 144 L 72 144 Z"/>
+  <path fill="#ffffff" d="M 144 96 L 200 96 L 200 160 L 176 160 L 176 120 L 144 120 Z"/>
+  <rect x="144" y="136" width="24" height="24" fill="#ffffff"/>
+</g></svg>
